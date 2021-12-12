@@ -24,9 +24,9 @@ public class Hashtable<K, V> extends Table<K, V> {
     }
 
     private transient Node<K, V>[] table;
-    private int filled_buckets = 0;
+    private int filledBuckets = 0;
 
-    private static final float LOAD_FACTOR = 0.5f;
+    private static final float LOAD_FACTOR = 0.6f;
     private static final int DEFAULT_SIZE = 7;
 
     public Hashtable() {
@@ -45,7 +45,7 @@ public class Hashtable<K, V> extends Table<K, V> {
 
     @Override
     public int size() {
-        return filled_buckets;
+        return filledBuckets;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class Hashtable<K, V> extends Table<K, V> {
 
     @Override
     public boolean isEmpty() {
-        return filled_buckets == 0;
+        return filledBuckets == 0;
     }
 
     /**
@@ -90,7 +90,7 @@ public class Hashtable<K, V> extends Table<K, V> {
     public boolean containsValue(Object value) {
         if (value == null) throw new IllegalArgumentException("Value cannot be null.");
         Node<K,V>[] tab; V v;
-        if ((tab = table) != null && filled_buckets > 0) {
+        if ((tab = table) != null && filledBuckets > 0) {
             for (Node<K,V> node : tab) {
                 if (node != null && ((v = node.value) == value || value.equals(v))) return true;
             }
@@ -113,7 +113,7 @@ public class Hashtable<K, V> extends Table<K, V> {
         if (index == -1) return null;
         var node = tab[index];
         tab[index] = null;
-        filled_buckets--;
+        filledBuckets--;
         return node.value;
     }
 
@@ -126,7 +126,7 @@ public class Hashtable<K, V> extends Table<K, V> {
         boolean match = (v = tab[index].value) == value || value.equals(v);
         if (match) {
             tab[index] = null;
-            filled_buckets--;
+            filledBuckets--;
         }
         return match;
     }
@@ -134,7 +134,7 @@ public class Hashtable<K, V> extends Table<K, V> {
     @Override
     public V put(K key, V value) {
         if (Checks.isAnyNull(key, value)) throw new IllegalArgumentException("Key or value cannot be null.");
-        if (table.length * LOAD_FACTOR <= filled_buckets) {
+        if (table.length * LOAD_FACTOR >= filledBuckets) {
             // ensures with linear probing
             ensureCapacity(table.length+1);
         }
@@ -144,7 +144,6 @@ public class Hashtable<K, V> extends Table<K, V> {
     private V internalPut(K key, V value) {
         Node<K,V>[] tab = table; int length = tab.length;
         int hash = Math.abs(Objects.hashCode(key));
-
         // uses linear probing
         int n = hash % (length-1);
         do {
@@ -154,7 +153,7 @@ public class Hashtable<K, V> extends Table<K, V> {
 
         V old = null;
         if (tab[n] != null) old = tab[n].value;
-        else filled_buckets++;
+        else filledBuckets++;
 
         tab[n] = new Node<>(key, value, hash);
         return old;
@@ -181,14 +180,14 @@ public class Hashtable<K, V> extends Table<K, V> {
     }
 
     private void makeFit(int mapSize) {
-        var maxSize = mapSize + filled_buckets;
+        var maxSize = mapSize + filledBuckets;
         var tab = table;
-        if (maxSize * LOAD_FACTOR >= tab.length) {
-            var newSize = IntegerUtil.nextPrime(maxSize);
-            while (tab.length * LOAD_FACTOR >= filled_buckets) {
-                newSize = IntegerUtil.nextPrime(newSize);
+        if (tab.length * LOAD_FACTOR >= maxSize) {
+            maxSize = IntegerUtil.nextPrime(maxSize);
+            while (tab.length * LOAD_FACTOR >= maxSize) {
+                maxSize = IntegerUtil.nextPrime(maxSize+1);
             }
-            table = reHashTable(tab, newSize);
+            table = reHashTable(tab, maxSize);
         }
     }
 
@@ -220,12 +219,12 @@ public class Hashtable<K, V> extends Table<K, V> {
         if (resetSize) {
             //noinspection unchecked
             table = (Node<K,V>[]) new Node[DEFAULT_SIZE];
-            filled_buckets = 0;
+            filledBuckets = 0;
             return;
         }
         Node<K,V>[] tab;
-        if ((tab = table) != null && filled_buckets > 0) {
-            filled_buckets = 0;
+        if ((tab = table) != null && filledBuckets > 0) {
+            filledBuckets = 0;
             for (int i = -1; ++i < tab.length;)
                 tab[i] = null;
         }
