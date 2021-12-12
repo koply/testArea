@@ -76,8 +76,8 @@ public class Hashtable<K, V> extends Table<K, V> {
         int n = indexOf(key, max);
         do {
             if (tab[n] != null && tab[n].key == key) return n;
-            n = (n+1) % max-1;
-        } while (++i < max);
+            n = (n+1) % (max-1);
+        } while ((++i) < max);
         return -1;
     }
 
@@ -146,7 +146,7 @@ public class Hashtable<K, V> extends Table<K, V> {
         int hash = Math.abs(Objects.hashCode(key));
 
         // uses linear probing
-        int n = hash & length-1;
+        int n = hash % (length-1);
         do {
             if (tab[n] == null || tab[n].key == key) { break; }
             n = (n+1) % length;
