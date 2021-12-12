@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+}
+
+group 'me.koply.test'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+apply plugin: 'idea'
+
+tasks.withType(GenerateProjectFileTask) {
+    gradleArgs = "--info --warning-mode all"
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+
+    implementation group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.33'
+    testImplementation group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.33'
+
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,11 @@
+.gradle/
+.idea/
+build/
+gradle/
+
+target/
+out/
+*.zip
+*.rar
+
+*.env
