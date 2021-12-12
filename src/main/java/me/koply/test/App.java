@@ -9,6 +9,10 @@ import java.util.Map;
 public class App {
 
     public static void main(String[] args) {
+
+    }
+
+    static void tableTest() {
         System.out.println("entered");
         Table<String, String> table = new Hashtable<>();
         table.put("asd", "asd");
@@ -61,8 +65,6 @@ public class App {
         for (var node : table) {
             System.out.println(node.key + " - " + node.value);
         }
-
-
     }
 
 }
