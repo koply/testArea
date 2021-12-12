@@ -171,7 +171,6 @@ public class Hashtable<K, V> extends Table<K, V> {
         Node<K, V>[] temp = (Node<K,V>[]) new Node[newSize];
         for (var node : old) {
             if (node == null) continue;
-            System.out.println(node.key + " - " + node.value + " - " + node.hash + " - " + newSize);
             int n = node.hash % newSize;
             while (temp[n] != null) { // linear probing
                 n = (n+1) % newSize;
