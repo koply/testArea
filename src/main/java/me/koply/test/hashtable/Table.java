@@ -1,6 +1,8 @@
 package me.koply.test.hashtable;
 
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public abstract class Table<K,V> implements Iterable<Hashtable.Node<K, V>> {
 
@@ -16,6 +18,13 @@ public abstract class Table<K,V> implements Iterable<Hashtable.Node<K, V>> {
     public abstract boolean isEmpty();
 
     public abstract V put(K key, V value);
+
+    /**
+     * @return true when putted
+     */
+    public abstract boolean putIfAbsent(K key, V value);
+
+    public abstract V getOrDefault(Object key, V defaultValue);
     public abstract V get(Object key);
     public abstract V remove(Object key);
     public abstract boolean remove(K key, V value);
@@ -25,6 +34,10 @@ public abstract class Table<K,V> implements Iterable<Hashtable.Node<K, V>> {
 
     public abstract void putAll(Map<? extends K, ? extends V> map);
     public abstract void putAll(Table<? extends K, ? extends V> table);
+
+    public abstract V compute(K key, BiFunction<? super K,? super V,? extends V> remappingFunction);
+    public abstract V computeIfAbsent(K key, Function<? super K,? extends V> mappingFunction);
+    public abstract V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction);
 
     /**
      * clears but size does not change

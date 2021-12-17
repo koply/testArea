@@ -4,6 +4,8 @@ import me.koply.test.util.Checks;
 import me.koply.test.util.IntegerUtil;
 
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * This class inspirated from HashMap.java for learn all the hashtable things.
@@ -26,7 +28,7 @@ public class Hashtable<K, V> extends Table<K, V> {
     private transient Node<K, V>[] table;
     private int filledBuckets = 0;
 
-    private static final float LOAD_FACTOR = 0.6f;
+    private static final float LOAD_FACTOR = 0.7f;
     private static final int DEFAULT_SIZE = 7;
 
     public Hashtable() {
@@ -81,6 +83,16 @@ public class Hashtable<K, V> extends Table<K, V> {
         return -1;
     }
 
+    private int exactIndex(int hash, Node<K,V>[] tab) {
+        int i = 0, max = tab.length;
+        int n = hash % (max-1);
+        do {
+            if (tab[n] != null && tab[n].hash == hash) return n;
+            n = (n+1) % (max-1);
+        } while ((++i) < max);
+        return -1;
+    }
+
     public boolean containsKey(Object key) {
         if (key == null) throw new IllegalArgumentException("Key cannot be null.");
         Node<K,V>[] tab = table;
@@ -100,9 +112,14 @@ public class Hashtable<K, V> extends Table<K, V> {
 
     @Override
     public V get(Object key) {
+        return this.getOrDefault(key, null);
+    }
+
+    @Override
+    public V getOrDefault(Object key, V defaultValue) {
         Node<K,V>[] tab = table;
         var index = exactIndex(key, tab);
-        return index == -1 ? null : tab[index].value;
+        return index == -1 ? defaultValue : tab[index].value;
     }
 
     @Override
@@ -138,12 +155,28 @@ public class Hashtable<K, V> extends Table<K, V> {
             // ensures with linear probing
             ensureCapacity(table.length+1);
         }
-        return internalPut(key, value);
+        int hash = Math.abs(Objects.hashCode(key));
+        return internalPut(key, value, hash);
     }
 
-    private V internalPut(K key, V value) {
-        Node<K,V>[] tab = table; int length = tab.length;
+    @Override
+    public boolean putIfAbsent(K key, V value) {
+        if (Checks.isAnyNull(key, value)) throw new IllegalArgumentException("Key or value cannot be null.");
         int hash = Math.abs(Objects.hashCode(key));
+        Node<K,V>[] tab = table;
+        boolean x = exactIndex(hash, tab) == -1;
+        if (x) internalPut(key, value, hash);
+        return x;
+    }
+
+    /**
+     * @param key key
+     * @param value value
+     * @param hash -> Math.abs(Objects.hashCode(key))
+     * @return old value of that key
+     */
+    private V internalPut(K key, V value, int hash) {
+        Node<K,V>[] tab = table; int length = tab.length;
         // uses linear probing
         int n = hash % (length-1);
         do {
@@ -196,7 +229,7 @@ public class Hashtable<K, V> extends Table<K, V> {
         if (map == null || map.isEmpty()) return;
         makeFit(map.size());
         for (var entry : map.entrySet()) {
-            internalPut(entry.getKey(), entry.getValue());
+            internalPut(entry.getKey(), entry.getValue(), Math.abs(Objects.hashCode(entry.getKey())));
         }
     }
 
@@ -205,8 +238,45 @@ public class Hashtable<K, V> extends Table<K, V> {
         if (map == null || map.isEmpty()) return;
         makeFit(map.size());
         for (var node : map) {
-            internalPut(node.key, node.value);
+            internalPut(node.key, node.value, node.hash);
         }
+    }
+
+    @Override
+    public V compute(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+        Node<K,V>[] tab = table;
+        int hash = Math.abs(Objects.hashCode(key));
+        var index = exactIndex(hash, tab);
+        boolean indexExists = index != -1;
+        V result = remappingFunction.apply(key, indexExists ? tab[index].value : null);
+        internalPut(key, result, hash);
+        return result;
+    }
+
+    @Override
+    public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
+        Node<K,V>[] tab = table;
+        int hash = Math.abs(Objects.hashCode(key));
+        var index = exactIndex(hash, tab);
+        if (index == -1) {
+            V result = mappingFunction.apply(key);
+            internalPut(key, result, hash);
+            return result;
+        }
+        return null;
+    }
+
+    @Override
+    public V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+        Node<K,V>[] tab = table;
+        int hash = Math.abs(Objects.hashCode(key));
+        var index = exactIndex(hash, tab);
+        if (index != -1) {
+            V result = remappingFunction.apply(key, tab[index].value);
+            tab[index] = new Node<>(key, result, hash);
+            return result;
+        }
+        return null;
     }
 
     @Override

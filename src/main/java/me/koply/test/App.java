@@ -65,6 +65,15 @@ public class App {
         for (var node : table) {
             System.out.println(node.key + " - " + node.value);
         }
+
+        table.compute("abc", (key, value) -> value.concat("OKK"));
+        table.compute("compute", (key, value) -> "key not found");
+        table.computeIfAbsent("absent", (key) -> key.concat("VALUE"));
+        table.computeIfPresent("jkl", (key, value) -> value.concat("PRESENT"));
+
+        for (var node : table) {
+            System.out.println(node.key + " - " + node.value);
+        }
     }
 
 }

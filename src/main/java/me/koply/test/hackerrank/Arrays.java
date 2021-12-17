@@ -5,17 +5,19 @@ import java.util.List;
 
 public class Arrays {
 
-
     public static void test() {
         var x = List.of(1,2,3,4,5,6,7,8,9,10,11);
-        long total = 0;
-        for (int i = 5000; i<10000; i++) {
-            var first = System.nanoTime();
-            var y = rotateLeft(5, x);
-            var last = System.nanoTime();
-            total += last-first;
+        System.out.println(reverseArray(x));
+    }
+
+    public static List<Integer> reverseArray(List<Integer> a) {
+        Integer[] arr = a.toArray(new Integer[0]);
+        Integer[] temp = new Integer[arr.length];
+        int x = arr.length;
+        for (int i : arr) {
+            temp[--x] = i;
         }
-        System.out.println((total/5000) + " avg ns");
+        return java.util.Arrays.asList(temp);
     }
 
     public static long arrayManipulation(int n, List<List<Integer>> queries) {
