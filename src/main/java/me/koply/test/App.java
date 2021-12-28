@@ -2,6 +2,7 @@ package me.koply.test;
 
 import me.koply.test.hashtable.Hashtable;
 import me.koply.test.hashtable.Table;
+import me.koply.test.linkedlist.LinkedListImpl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +10,24 @@ import java.util.Map;
 public class App {
 
     public static void main(String[] args) {
-        tableTest();
+        linkedlistTest();
+    }
+
+    static void linkedlistTest() {
+        var list = new LinkedListImpl<String>();
+        for (int i = 0; i<12; i++) {
+            list.add(i+"");
+        }
+        // 0-11 -> 12 size
+        System.out.println(list.size());
+        System.out.println(list.get(11));
+        list.add(11, "5555555");
+        System.out.println(list.get(5));
+        System.out.println(list.size());
+
+        for (String str : list) {
+            System.out.println(str);
+        }
     }
 
     static void tableTest() {
