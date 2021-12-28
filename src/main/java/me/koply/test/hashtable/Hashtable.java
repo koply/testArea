@@ -62,7 +62,7 @@ public class Hashtable<K, V> extends Table<K, V> {
 
     /**
      * @param key key object
-     * @param lastIndex length-1
+     * @param lastIndex length
      * @return index of the key
      */
     private int indexOf(Object key, int lastIndex) {
