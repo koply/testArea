@@ -4,6 +4,18 @@ import static java.lang.Math.sqrt;
 
 public class IntegerUtil {
 
+    /**
+     * @param str the string that parse to Integer
+     * @return if the string cannot vonvert to integer it'll return null
+     */
+    public static Integer parseInt(String str) {
+        try {
+            return Integer.parseInt(str);
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
     public static boolean isPrime(long n) {
         if(n < 2) return false;
         if(n == 2 || n == 3) return true;
