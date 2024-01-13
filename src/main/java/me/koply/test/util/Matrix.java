@@ -123,6 +123,10 @@ public class Matrix {
         return result;
     }
 
+    public static void printMatrixIteration(BiFunction<Integer, Integer, Integer> function, int[][] a, int[][] b) {
+        printMatrix(matrixIteration(function, a, b));
+    }
+
     public static void printMatrix(int[][] matrix) {
         System.out.println(Arrays.deepToString(matrix));
     }
@@ -131,24 +135,19 @@ public class Matrix {
         matrixMultiplication();
         matrixAddition();
 
-        int[][] x;
 
         System.out.println("Addition with iteration: ");
 
-        x = matrixIteration(Integer::sum, defaultArray1, defaultArray2);
-        printMatrix(x);
+        printMatrixIteration(Integer::sum, defaultArray1, defaultArray2);
 
         System.out.println("Subtraction with iteration: ");
-        x = matrixIteration((a, b) -> a-b, defaultArray1, defaultArray2);
-        printMatrix(x);
+        printMatrixIteration((a, b) -> a-b, defaultArray1, defaultArray2);
 
         System.out.println("Selecting minimum with iteration: ");
-        x = matrixIteration(Integer::min, defaultArray1, defaultArray2);
-        printMatrix(x);
+        printMatrixIteration(Integer::min, defaultArray1, defaultArray2);
 
         System.out.println("Selection maximum with iteration: ");
-        x = matrixIteration(Integer::max, defaultArray1, defaultArray2);
-        printMatrix(x);
+        printMatrixIteration(Integer::max, defaultArray1, defaultArray2);
 
         System.gc();
         System.out.println("Bye, bye!");
